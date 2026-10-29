@@ -162,6 +162,9 @@ body{background:#fff}
 .mo{background:rgba(255,255,255,.6)}
 
 .bw[data-g],.ring[data-g]{cursor:pointer}
+.lc>.card.ch:first-child{grid-column:1/-1}
+.lc .donut{justify-content:center;gap:48px}
+.lc .dl{flex:0 1 460px}
 /* ---- motion ---- */
 @media (prefers-reduced-motion:no-preference){
 @keyframes cardin{from{opacity:0;transform:translateY(16px) scale(.985)}}
@@ -197,6 +200,55 @@ body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s
 .mo.out{animation:fadein .18s reverse both!important}
 .mo.out .mp{animation:popout .18s both!important}
 }
+/* ---- responsive: คอม / แท็บเลต / มือถือ ---- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.sx{flex:1;min-height:0;display:flex;flex-direction:column}
+@media(max-width:1100px){
+ html,body{height:auto}
+ body{overflow-x:hidden;overflow-y:auto}
+ .wrap{height:auto;padding:14px 14px 24px;gap:12px}
+ .top{grid-template-columns:1fr 1fr}
+ .main,.lc{grid-template-columns:minmax(0,1fr)}
+ .main{flex:none}
+ .lc{grid-template-rows:none}
+ .lc>*{min-height:240px}
+ .rc{min-height:0}
+ .rc>.card.ch{flex:none!important;min-height:270px}
+ .tp{flex:none}
+ .rows{max-height:none;overflow:visible}
+ .tbl{overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .tbl .r,.tbl .rows{min-width:640px}
+ .cap,.tools{flex-wrap:wrap}
+ .rings{flex:none;overflow:visible;grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}
+ .sx{overflow-x:auto;-webkit-overflow-scrolling:touch;min-height:300px}
+ .sx .plot,.sx .gl{min-width:560px}
+}
+@media(max-width:640px){
+ .wrap{padding:12px 10px 22px}
+ h1{font-size:19px}
+ .top{grid-template-columns:1fr}
+ .card,.panel{padding:14px;border-radius:24px}
+ .big b{font-size:28px}.ch .split .big b{font-size:26px}
+ .split{flex-wrap:wrap;gap:8px 20px}
+ .step .v{font-size:24px}
+ .lc .donut{flex-direction:column;gap:14px}
+ .donut svg{height:auto;width:min(230px,72%);max-height:none}
+ .lc .dl{flex:none;width:100%}
+ .bv span{font-size:9.5px}
+ .mo{padding:10px}
+ .mp{padding:14px 12px;border-radius:22px;max-height:90vh}
+ .mt{font-size:12px}.mt th,.mt td{padding:7px 8px}
+}
+@media(min-width:1101px) and (max-height:760px){
+ html,body{height:auto}
+ body{overflow-y:auto}
+ .wrap{height:auto}
+ .main{flex:none}
+ .lc{grid-template-rows:none}
+ .lc>*{min-height:280px}
+ .rc>.card.ch{flex:none!important;min-height:280px}
+ .sx{min-height:260px}
+}
 </style>
 </head>
 <body>
@@ -217,8 +269,7 @@ body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s
 <section class="main">
   <div class="lc">
     <div class="card ch"><div class="cap"><h2>สถานะรายการทั้งหมด</h2></div><div class="split" id="sum"></div><div class="donut" id="c1"></div></div>
-    <div class="card ch"><div class="cap"><h2>แขวงที่มีคำขอมากที่สุด</h2><span class="sub" id="c3s"></span></div><div class="rk" id="c3"></div><div class="lg"><span><em style="background:var(--s2)"></em>(4) กลุ่มงานสิ่งแวดล้อมส่งเรื่องเข้ากระทรวง</span><span><em style="background:var(--s0)"></em>ยังไม่ส่งเรื่องเข้ากระทรวง</span></div></div>
-    <div class="card ch wide"><div class="cap"><h2>เปรียบเทียบรายสทล.</h2><span class="sub">จำนวนรายการ · กดแท่งเพื่อดูรายการ</span></div><div class="plot" id="c2"></div><div class="gl" id="c2l"></div><div class="lg" id="c2g"></div></div>
+    <div class="card ch wide"><div class="cap"><h2>เปรียบเทียบรายสทล.</h2><span class="sub">จำนวนรายการ · กดแท่งเพื่อดูรายการ</span></div><div class="sx"><div class="plot" id="c2"></div><div class="gl" id="c2l"></div></div><div class="lg" id="c2g"></div></div>
   </div>
   <div class="rc">
     <div class="panel tp">
@@ -404,13 +455,6 @@ function drawCharts(){
   return `<div class="bw" data-g="${esc(x.name)}" data-s="${si}" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*4+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
  $('c2l').innerHTML=G.map(x=>`<div title="${esc(x.name)}">${esc(short(x.name))}</div>`).join('');
  $('c2g').innerHTML=SER.map(s=>`<span><em style="background:var(${s.c})"></em>${esc(s.l)}</span>`).join('');
- /* 3 อันดับแขวง */
- const K=G.flatMap(x=>x.kids).sort((a,b)=>b.req-a.req||nat(a.name,b.name));
- const top=K.slice(0,8),m3=Math.max(1,...top.map(x=>x.req));
- $('c3s').textContent=K.length>8?`8 อันดับแรกจาก ${K.length} แขวง`:`${K.length} แขวง`;
- $('c3').innerHTML=top.map(x=>`<div class="rkr"><div class="n">${esc(x.name)}<small>${esc(x.stl)}</small></div>
-  <div class="t"><i style="width:${x.at[2]/m3*100}%;background:var(--s2)"></i><i style="width:${(x.req-x.at[2])/m3*100}%;background:var(--s0)"></i></div>
-  <div class="c"><b data-n="${x.at[2]}">${x.at[2]}</b>/${x.req}</div></div>`).join('');
  /* 4 วงแหวนรายสทล. */
  $('c4').innerHTML=G.map(x=>`<div class="ring" data-g="${esc(x.name)}">${ring(38,9,96,x.req?x.at[2]/x.req:0,'var(--s2)',x.req?pct(x.at[2],x.req)+'%':'–',null,x.req?pct(x.at[2],x.req):null)}
   <div class="rt"><b title="${esc(x.name)}">${esc(short(x.name))}</b>${x.at[2]} / ${x.req} คำขอ</div></div>`).join('');
