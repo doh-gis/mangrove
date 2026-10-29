@@ -130,6 +130,42 @@ button:hover{background:rgba(255,255,255,.85)}
 .mt .n{color:var(--mute);width:36px}
 .mt .nw{white-space:nowrap}
 .me{padding:28px 0;text-align:center;color:var(--mute)}
+
+/* ---- motion ---- */
+@media (prefers-reduced-motion:no-preference){
+@keyframes cardin{from{opacity:0;transform:translateY(16px) scale(.985)}}
+@keyframes grow{from{width:0}}
+@keyframes rise{from{height:0}}
+@keyframes sweep{from{stroke-dasharray:0 600}}
+@keyframes fadein{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.96)}}
+@keyframes popout{to{opacity:0;transform:translateY(8px) scale(.97)}}
+@keyframes rowin{from{opacity:0;transform:translateY(-6px)}}
+body.intro .card,body.intro .panel{animation:cardin .75s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+body.intro .bar i,body.intro .rkr .t i{animation:grow 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms + 300ms)}
+body.intro .bv{animation:rise 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms + 300ms + var(--j,0)*25ms)}
+body.intro .bv span{animation:fadein .5s both;animation-delay:calc(var(--i,0)*70ms + 1100ms + var(--j,0)*25ms)}
+body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms + 300ms)}
+/* hover */
+.card,.panel{transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s}
+.card:hover,.panel:hover{transform:translateY(-3px);box-shadow:0 18px 48px rgba(40,55,75,.17),inset 0 1px 0 rgba(255,255,255,.8)}
+.bv{transition:transform .2s,filter .2s}
+.bw:hover .bv{transform:translateY(-4px);filter:brightness(1.07) saturate(1.1)}
+.bw:hover .bv span{color:var(--ink);font-weight:700}
+.donut svg circle{transition:stroke-width .22s;cursor:pointer}
+.donut svg circle:hover{stroke-width:28px}
+.ring svg{transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.ring:hover svg{transform:scale(1.07)}
+.rkr{border-radius:8px;transition:background .2s}.rkr:hover{background:rgba(255,255,255,.55)}
+.rkr .t i{transition:filter .2s}.rkr:hover .t i{filter:brightness(1.08)}
+.r{transition:background .18s}
+.r.k.nw{animation:rowin .32s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--k,0)*45ms)}
+/* popup */
+.mo:not([hidden]){animation:fadein .25s both}
+.mo:not([hidden]) .mp{animation:pop .38s cubic-bezier(.2,.9,.3,1.1) both}
+.mo.out{animation:fadein .18s reverse both!important}
+.mo.out .mp{animation:popout .18s both!important}
+}
 </style>
 </head>
 <body>
@@ -191,7 +227,19 @@ const pct=(a,b)=>b?Math.round(a/b*100):0;
 const short=n=>n.replace(/^กองทางหลวงพิเศษระหว่างเมือง$/,'ทล.พิเศษ');
 const SP=/พิเศษระหว่างเมือง/;
 const nat=(a,b)=>a.localeCompare(b,'th',{numeric:true});
-let ROWS=[],GR=[],T=null,SORT=['name',1],OPEN=new Set();
+let ROWS=[],GR=[],T=null,SORT=['name',1],OPEN=new Set(),JUST=null;
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+let INTRO=!RM;
+function count(el,delay){const to=+el.dataset.n,sx=el.dataset.s||'';el.textContent='0'+sx;
+ setTimeout(()=>{const t0=performance.now(),d=1200;
+  const step=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(to*e))+sx;if(k<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step)},delay)}
+function intro(){if(!INTRO)return;INTRO=false;
+ const b=document.body;b.classList.add('intro');
+ document.querySelectorAll('.card,.panel').forEach((el,i)=>el.style.setProperty('--i',i));
+ document.querySelectorAll('[data-n]').forEach(el=>{const c=el.closest('.card,.panel');
+  count(el,250+(c?+c.style.getPropertyValue('--i'):0)*70)});
+ setTimeout(()=>b.classList.remove('intro'),3400)}
 
 function parseCSV(t){const rows=[];let r=[],f='',q=false;
  for(let i=0;i<t.length;i++){const c=t[i];
@@ -232,19 +280,19 @@ function stack(a){
 
 function render(){
  const M=ROWS.map(model);T=blank();M.forEach(m=>add(T,m));
- $('sum').innerHTML=`<div class="big"><b>${fmt(T.total)}</b><span>รายการทั้งหมด</span></div>
-  <div class="big"><b style="color:var(--s2)">${fmt(T.req)}</b><span>มีคำขอแล้ว (${pct(T.req,T.total)}%)</span></div>
-  <div class="big"><b style="color:var(--mute)">${fmt(T.noReq)}</b><span>ยังไม่มีคำขอ (${pct(T.noReq,T.total)}%)</span></div>`;
+ $('sum').innerHTML=`<div class="big"><b data-n="${T.total}">${fmt(T.total)}</b><span>รายการทั้งหมด</span></div>
+  <div class="big"><b style="color:var(--s2)" data-n="${T.req}">${fmt(T.req)}</b><span>มีคำขอแล้ว (${pct(T.req,T.total)}%)</span></div>
+  <div class="big"><b style="color:var(--mute)" data-n="${T.noReq}">${fmt(T.noReq)}</b><span>ยังไม่มีคำขอ (${pct(T.noReq,T.total)}%)</span></div>`;
  $('sumbar').innerHTML=T.total?stack(T).replace('<div class="bar">','').replace(/<\/div>$/,''):'';
  $('steps').innerHTML=[0,1].map(i=>`<div class="card step" style="--c:var(${SEG[i+2]})">
   <div class="t">${esc(STEPS[i])}</div>
-  <div class="v">${fmt(T.s[i])}<small>จาก ${fmt(T.req)} (${pct(T.s[i],T.req)}%)</small></div>
+  <div class="v"><span data-n="${T.s[i]}">${fmt(T.s[i])}</span><small>จาก ${fmt(T.req)} (${pct(T.s[i],T.req)}%)</small></div>
   <div class="bar"><i style="width:${pct(T.s[i],T.req)}%"></i></div></div>`).join('');
  const g={};
  M.forEach(m=>{const G=(g[m.stl]??={...blank(),name:m.stl,k:{}});add(G,m);
   const K=(G.k[m.khw]??={...blank(),name:m.khw,stl:m.stl,items:[]});add(K,m);K.items.push(m)});
  GR=Object.values(g);GR.forEach(x=>x.kids=Object.values(x.k));
- drawTable();drawCharts();
+ drawTable();drawCharts();intro();
 }
 
 /* ---------- ตาราง ---------- */
@@ -261,7 +309,7 @@ function rowHTML(x,o){
  const z=n=>n?fmt(n):'<span class="zero">0</span>';
  const nm=o.kid?esc(x.name):`<span class="tg">${o.exp?(o.open?'−':'+'):''}</span>${esc(x.name)}`;
  const at=o.kid?`data-kid="${esc(x.stl+'|'+x.name)}"`:(o.exp?`data-g="${esc(x.name)}"`:'');
- return `<div class="r ${o.kid?'k e':'g'} ${(!o.kid&&o.exp)?'e':''} ${o.open?'o':''}" ${at}>
+ return `<div class="r ${o.kid?'k e':'g'} ${(!o.kid&&o.exp)?'e':''} ${o.open?'o':''} ${o.nw?'nw':''}" ${at}${o.nw?` style="--k:${o.k}"`:''}>
   <div class="nm">${nm}</div><div>${fmt(x.total)}</div><div>${z(x.noReq)}</div><div>${z(x.req)}</div>
   <div>${z(x.s[0])}</div><div>${z(x.s[1])}</div><div>${stack(x)}</div></div>`}
 const one=v=>clean(v).replace(/\s*\n\s*/g,' · ');
@@ -280,14 +328,17 @@ function showKid(key){
   :'<div class="me">ยังไม่มีคำขอในแขวงนี้</div>';
  $('mo').hidden=false;
 }
-const closeM=()=>{$('mo').hidden=true};
+const closeM=()=>{const m=$('mo');if(m.hidden||m.classList.contains('out'))return;
+ if(RM){m.hidden=true;return}
+ m.classList.add('out');setTimeout(()=>{m.hidden=true;m.classList.remove('out')},190)};
 function drawTable(){
  const old=$('tbl').querySelector('.rows'),st=old?old.scrollTop:0;
  const rows=[...sortRows(GR.filter(x=>x.name!==NR)),...GR.filter(x=>x.name===NR)];
  let h='';
  rows.forEach(x=>{const exp=expandable(x),open=exp&&OPEN.has(x.name);
   h+=rowHTML(x,{exp,open});
-  if(open)h+=sortRows(x.kids).map(k=>rowHTML(k,{kid:true})).join('')});
+  if(open){const nw=JUST&&(JUST==='*'||JUST===x.name);h+=sortRows(x.kids).map((k,ki)=>rowHTML(k,{kid:true,nw,k:ki})).join('')}});
+ JUST=null;
  $('tbl').innerHTML=hdr()+`<div class="rows">${h}</div>`+foot();
  const nr=$('tbl').querySelector('.rows');if(nr)nr.scrollTop=st;
  const ex=GR.filter(expandable);
@@ -295,30 +346,30 @@ function drawTable(){
 }
 
 /* ---------- ชาร์ต ---------- */
-function ring(R,w,size,frac,col,txt,sub){
+function ring(R,w,size,frac,col,txt,sub,n){
  const C=2*Math.PI*R,l=Math.max(0,Math.min(1,frac))*C,c=size/2;
  return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="rgba(40,55,75,.12)" stroke-width="${w}"/>
  ${l?`<circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="${col}" stroke-width="${w}" stroke-dasharray="${l} ${C-l}" transform="rotate(-90 ${c} ${c})"/>`:''}
- <text x="${c}" y="${c+(sub?-2:6)}" text-anchor="middle" font-size="${size>120?26:19}" font-weight="700" fill="#1b2430">${txt}</text>
+ <text x="${c}" y="${c+(sub?-2:6)}" text-anchor="middle" font-size="${size>120?26:19}" font-weight="700" fill="#1b2430"${n!=null?` data-n="${n}" data-s="%"`:''}>${txt}</text>
  ${sub?`<text x="${c}" y="${c+16}" text-anchor="middle" font-size="11" fill="#7a8694">${sub}</text>`:''}</svg>`}
 
 function donut(parts){
  const R=52,C=2*Math.PI*R,tot=parts.reduce((a,p)=>a+p.n,0)||1;let off=0;
  const arcs=parts.filter(p=>p.n).map(p=>{const l=p.n/tot*C;
-  const s=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="var(${p.c})" stroke-width="22" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`;off+=l;return s}).join('');
- return `<svg viewBox="0 0 140 140">${arcs}<text x="70" y="68" text-anchor="middle" font-size="26" font-weight="700" fill="#1b2430">${pct(T.req,T.total)}%</text><text x="70" y="86" text-anchor="middle" font-size="11" fill="#7a8694">มีคำขอแล้ว</text></svg>`}
+  const s=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="var(${p.c})" stroke-width="22" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"><title>${esc(p.l)}: ${fmt(p.n)}</title></circle>`;off+=l;return s}).join('');
+ return `<svg viewBox="0 0 140 140">${arcs}<text x="70" y="68" text-anchor="middle" font-size="26" font-weight="700" fill="#1b2430" data-n="${pct(T.req,T.total)}" data-s="%">${pct(T.req,T.total)}%</text><text x="70" y="86" text-anchor="middle" font-size="11" fill="#7a8694">มีคำขอแล้ว</text></svg>`}
 
 function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>(SP.test(a.name)-SP.test(b.name))||nat(a.name,b.name));
  /* 1 โดนัต */
  const P=[{n:T.noReq,c:'--none',l:'ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'มีคำขอ ยังไม่ยื่น'},
   {n:T.at[1],c:'--s1',l:'แขวงยื่นคำขอแล้ว',s:'(แต่ยังไม่ได้ยื่นต่ออธิบดีฯ)'},{n:T.at[2],c:'--s2',l:'ยื่นต่ออธิบดีฯ แล้ว'}];
- $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b>${fmt(p.n)}</b></div>`).join('')+'</div>';
+ $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
  const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total},{l:'มีคำขอ',c:'--req',f:x=>x.req},{l:SHORT[0],c:'--s1',f:x=>x.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1]}];
  const mx=Math.max(1,...G.map(x=>x.total));
- $('c2').innerHTML='<div class="grs">'+G.map(x=>'<div class="gr">'+SER.map(s=>{const v=s.f(x);
-  return `<div class="bw"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c})"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
+ $('c2').innerHTML='<div class="grs">'+G.map((x,gi)=>'<div class="gr">'+SER.map((s,si)=>{const v=s.f(x);
+  return `<div class="bw" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*4+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
  $('c2l').innerHTML=G.map(x=>`<div title="${esc(x.name)}">${esc(short(x.name))}</div>`).join('');
  $('c2g').innerHTML=SER.map(s=>`<span><em style="background:var(${s.c})"></em>${esc(s.l)}</span>`).join('');
  /* 3 อันดับแขวง */
@@ -327,9 +378,9 @@ function drawCharts(){
  $('c3s').textContent=K.length>8?`8 อันดับแรกจาก ${K.length} แขวง`:`${K.length} แขวง`;
  $('c3').innerHTML=top.map(x=>`<div class="rkr"><div class="n">${esc(x.name)}<small>${esc(x.stl)}</small></div>
   <div class="t"><i style="width:${x.at[2]/m3*100}%;background:var(--s2)"></i><i style="width:${(x.req-x.at[2])/m3*100}%;background:var(--s0)"></i></div>
-  <div class="c"><b>${x.at[2]}</b>/${x.req}</div></div>`).join('');
+  <div class="c"><b data-n="${x.at[2]}">${x.at[2]}</b>/${x.req}</div></div>`).join('');
  /* 4 วงแหวนรายสทล. */
- $('c4').innerHTML=G.map(x=>`<div class="ring">${ring(38,9,96,x.req?x.at[2]/x.req:0,'var(--s2)',x.req?pct(x.at[2],x.req)+'%':'–')}
+ $('c4').innerHTML=G.map(x=>`<div class="ring">${ring(38,9,96,x.req?x.at[2]/x.req:0,'var(--s2)',x.req?pct(x.at[2],x.req)+'%':'–',null,x.req?pct(x.at[2],x.req):null)}
   <div class="rt"><b title="${esc(x.name)}">${esc(short(x.name))}</b>${x.at[2]} / ${x.req} คำขอ</div></div>`).join('');
 }
 
@@ -340,10 +391,10 @@ document.addEventListener('click',e=>{
  if(kr){showKid(kr.dataset.kid);return}
  if(e.target.id==='mo'||e.target.id==='mx'){closeM();return}
  const tr=e.target.closest('.r.g[data-g]');
- if(tr){const n=tr.dataset.g;OPEN.has(n)?OPEN.delete(n):OPEN.add(n);drawTable()}});
+ if(tr){const n=tr.dataset.g;if(OPEN.has(n))OPEN.delete(n);else{OPEN.add(n);JUST=n}drawTable()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
 $('allbtn').onclick=()=>{const ex=GR.filter(expandable);
- if(ex.every(x=>OPEN.has(x.name)))OPEN.clear();else ex.forEach(x=>OPEN.add(x.name));drawTable()};
+ if(ex.every(x=>OPEN.has(x.name)))OPEN.clear();else{ex.forEach(x=>OPEN.add(x.name));JUST='*'}drawTable()};
 load();
 setInterval(load,5*60*1000);
 </script>
