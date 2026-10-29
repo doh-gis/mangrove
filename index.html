@@ -140,27 +140,31 @@ button:hover{background:rgba(255,255,255,.85)}
 .mt tr.st:hover td{background:color-mix(in srgb,var(--c) 42%,transparent)}
 .me{padding:28px 0;text-align:center;color:var(--mute)}
 
-/* ---- bubble theme: พื้นขาว การ์ดเป็นฟองใส ---- */
+/* ---- liquid glass: พื้นขาว การ์ดกระจกใสแบบ iOS ---- */
 body{background:#fff}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(38% 34% at 8% 12%,rgba(0,175,185,.16),transparent 70%),radial-gradient(34% 32% at 92% 8%,rgba(240,113,103,.13),transparent 70%),radial-gradient(40% 36% at 14% 96%,rgba(254,217,183,.42),transparent 70%),radial-gradient(36% 34% at 88% 90%,rgba(0,175,185,.12),transparent 70%)}
 .card,.panel{position:relative;isolation:isolate;border-radius:30px;
- background:radial-gradient(130% 100% at 16% 6%,rgba(255,255,255,.9),rgba(255,255,255,.28) 38%,rgba(255,255,255,.08) 70%,rgba(255,255,255,.22)),
-  linear-gradient(135deg,rgba(0,175,185,.08),rgba(240,113,103,.05) 55%,rgba(254,217,183,.16));
- border:1px solid rgba(120,170,195,.30);
- --sh:0 14px 34px rgba(50,90,120,.10),inset 0 0 0 1.5px rgba(255,255,255,.85),inset 0 -16px 32px rgba(0,175,185,.07),inset 0 14px 28px rgba(255,255,255,.75);
- --shh:0 20px 44px rgba(50,90,120,.16),inset 0 0 0 1.5px rgba(255,255,255,.9),inset 0 -18px 36px rgba(0,175,185,.10),inset 0 14px 28px rgba(255,255,255,.8);
+ background:linear-gradient(145deg,rgba(255,255,255,.62),rgba(255,255,255,.22) 55%,rgba(255,255,255,.40));
+ -webkit-backdrop-filter:blur(22px) saturate(190%);backdrop-filter:blur(22px) saturate(190%);
+ border:1px solid rgba(255,255,255,.55);
+ --sh:0 12px 32px rgba(40,70,100,.12),0 2px 8px rgba(40,70,100,.06),inset 0 0 0 1px rgba(110,150,180,.20),inset 2px 2px 3px -1px rgba(255,255,255,.95),inset -2px -2px 3px -1px rgba(255,255,255,.75),inset 0 0 28px rgba(255,255,255,.45);
+ --shh:0 18px 44px rgba(40,70,100,.18),0 3px 10px rgba(40,70,100,.08),inset 0 0 0 1px rgba(110,150,180,.20),inset 2px 2px 3px -1px rgba(255,255,255,.95),inset -2px -2px 3px -1px rgba(255,255,255,.75),inset 0 0 28px rgba(255,255,255,.45);
  box-shadow:var(--sh)}
-.card::before,.panel::before{content:'';position:absolute;z-index:-1;top:9px;left:7%;width:34%;height:16%;border-radius:50%;pointer-events:none;
- background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0))}
-.card::after,.panel::after{content:'';position:absolute;z-index:-1;right:6%;bottom:8px;width:16%;height:8%;border-radius:50%;pointer-events:none;
- background:linear-gradient(0deg,rgba(0,175,185,.14),rgba(0,175,185,0))}
-#steps .step:nth-child(2){--sh:0 14px 34px rgba(0,98,108,.28),inset 0 0 0 1.5px rgba(255,255,255,.28),inset 0 12px 26px rgba(255,255,255,.14);--shh:0 20px 44px rgba(0,98,108,.34),inset 0 0 0 1.5px rgba(255,255,255,.34),inset 0 12px 26px rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
-#steps .step:nth-child(2)::before{background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0))}
-#steps .step:nth-child(2)::after{display:none}
+.card::before,.panel::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+ background:linear-gradient(118deg,rgba(255,255,255,.75) 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,0) 62%,rgba(255,255,255,.35) 100%)}
+.card::after,.panel::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
+ background:linear-gradient(135deg,#fff,rgba(255,255,255,.15) 30%,rgba(130,185,210,.28) 70%,#fff);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+ mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+#steps .step:nth-child(2){background:linear-gradient(145deg,rgba(0,122,134,.92),rgba(0,88,98,.95));border-color:rgba(255,255,255,.25);
+ --sh:0 14px 34px rgba(0,98,108,.30),inset 0 0 0 1px rgba(255,255,255,.22),inset 2px 2px 3px -1px rgba(255,255,255,.55),inset -2px -2px 3px -1px rgba(255,255,255,.25);
+ --shh:0 20px 46px rgba(0,98,108,.36),inset 0 0 0 1px rgba(255,255,255,.28),inset 2px 2px 3px -1px rgba(255,255,255,.6),inset -2px -2px 3px -1px rgba(255,255,255,.3)}
+#steps .step:nth-child(2)::before{background:linear-gradient(118deg,rgba(255,255,255,.30),rgba(255,255,255,0) 30%,rgba(255,255,255,0) 65%,rgba(255,255,255,.12))}
 .split{flex:none;gap:26px;margin-bottom:6px}
 .ch .split .big b{font-size:30px}
-.mp{border-radius:30px}
+.mp{border-radius:30px;background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%)}
 .mo{background:rgba(255,255,255,.6)}
-
 .bw[data-g],.ring[data-g]{cursor:pointer}
 .lc>.card.ch:first-child{grid-column:1/-1}
 .lc .donut{justify-content:center;gap:48px}
@@ -276,7 +280,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="cap"><h2>รายสทล. / รายแขวง</h2><div class="tools"><span class="sub">กด + เพื่อดูรายแขวง · กดชื่อแขวงเพื่อดูรายการคำขอ</span><button id="allbtn">ขยายทั้งหมด</button></div></div>
       <div class="tbl" id="tbl"></div>
     </div>
-    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่กลุ่มงานสิ่งแวดล้อมส่งเรื่องเข้ากระทรวงแล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ · กดวงแหวนเพื่อดูรายการ</span></div><div class="rings" id="c4"></div></div>
+    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่กลุ่มงานสิ่งแวดล้อมส่งเรื่องขอผ่อนผัน มติ ครม. เข้ากระทรวงแล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ · กดวงแหวนเพื่อดูรายการ</span></div><div class="rings" id="c4"></div></div>
   </div>
 </section>
 </div>
@@ -287,7 +291,7 @@ const COL={base:[6,7,8,9,10,11],req:13,stl:21,stl2:20,khw:22,steps:[27,28]};
 /* วาง URL ของ Web App (ลงท้ายด้วย /exec) หลัง Deploy Apps Script */
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycbwGJrFL1qzYhi8BnCl9a_Arzm9B5c-0wQoO4Ad0Nbndptly3XV5sKDpP1rdRhYjhfxSIQ/exec';
 const NR='ยังไม่ได้ยื่นคำขอ';
-const STEPS=['(3) ส่งเรื่องมาที่ กลุ่มงานสิ่งแวดล้อม สำนักแผน','(4) กลุ่มงานสิ่งแวดล้อมส่งเรื่องเข้ากระทรวง'];
+const STEPS=['(3) ส่งเรื่องขอผ่อนผัน มติ ครม. มาที่ กลุ่มงานสิ่งแวดล้อม สำนักแผน','(4) กลุ่มงานสิ่งแวดล้อมส่งเรื่องขอผ่อนผัน มติ ครม. เข้ากระทรวง'];
 const SHORT=STEPS;
 const SEG=['--none','--s0','--s1','--s2'];
 const $=id=>document.getElementById(id);
@@ -396,7 +400,7 @@ function openList(title,sub,it){
  const ix=m=>m.hasReq?m.stage+1:0;
  $('mt').textContent=title;$('ms').textContent=sub;
  const cn=[0,0,0,0];it.forEach(m=>cn[ix(m)]++);
- $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[['(1) ยังไม่มีคำขอ',0],['(2) ยื่นคำขอแล้ว ยังไม่ส่งเอกสารให้กลุ่มงาน สวล.',1],[STEPS[0],2],[STEPS[1],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
+ $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[['(1) ยังไม่มีคำขอ',0],['(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',1],[STEPS[0],2],[STEPS[1],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
  $('mbody').innerHTML=it.length?'<table class="mt"><thead><tr><th>#</th>'+MCOLS.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
   it.map((m,i)=>'<tr class="st" style="--c:var('+SEG[ix(m)]+')"><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[3]?'nw':''}">${esc(mcell(m,c))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
   :'<div class="me">ไม่มีรายการ</div>';
@@ -445,11 +449,11 @@ function donut(parts){
 function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>nat(a.name,b.name));
  /* 1 โดนัต */
- const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเอกสารให้กลุ่มงาน สวล.'},
+ const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.'},
   {n:T.at[1],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.at[2],c:'--s2',l:STEPS[1]}];
  $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
- const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเอกสารให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.hasReq&&m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.hasReq&&m.s[1]}];SERS=SER;;
+ const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.hasReq&&m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.hasReq&&m.s[1]}];SERS=SER;;
  const mx=Math.max(1,...G.map(x=>x.total));
  $('c2').innerHTML='<div class="grs">'+G.map((x,gi)=>'<div class="gr">'+SER.map((s,si)=>{const v=s.f(x);
   return `<div class="bw" data-g="${esc(x.name)}" data-s="${si}" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*4+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
