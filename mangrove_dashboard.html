@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard คำขออนุญาตทำประโยชน์ในเขตป่าชายเลน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e6d8c0;--panel:rgba(255,255,255,.4);--ink:#1b2430;--mute:#7a8694;--line:rgba(40,55,75,.12);
+--none:#dcd2c2;--s0:#f3e2a6;--s1:#efb94f;--s2:#6f93c0;--s3:#3f9477;--req:#b9ad9a;
+--cols:minmax(120px,1.5fr) repeat(3,minmax(40px,.5fr)) repeat(2,minmax(68px,.9fr)) minmax(60px,1fr)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 Sarabun,"Noto Sans Thai",sans-serif;overflow:hidden}
+.wrap{height:100%;display:flex;flex-direction:column;gap:14px;padding:18px 24px}
+header{flex:none;display:flex;gap:12px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:22px;font-weight:700;line-height:1.2}
+.sub{color:var(--mute);font-size:12px}
+.tools{display:flex;gap:8px;align-items:center}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 9px;color:var(--ink);cursor:pointer}
+button:hover{background:#f5f7f9}
+.msg{flex:none;padding:8px 12px;border-radius:6px;background:#fff4d6;border:1px solid #ecd48a;font-size:13px;display:none}
+.top{flex:none;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;min-height:0;min-width:0}
+.split{display:flex;gap:26px;align-items:baseline;margin-bottom:8px}
+.big b{font-size:30px;font-weight:700;line-height:1}
+.big span{display:block;color:var(--mute);font-size:12px}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--none)}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--mute)}
+.legend em,.lg em{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.step{border-top:3px solid var(--c)}
+.step .t{font-weight:700;margin:1px 0 4px}
+.step .v{font-size:28px;font-weight:700;line-height:1.1}
+.step .v small{font-size:12px;font-weight:400;color:var(--mute);margin-left:6px}
+.step .bar{height:6px;margin-top:10px}
+.step .bar i{background:var(--c)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(660px,1.08fr);gap:14px}
+.lc{min-height:0;display:grid;grid-template-columns:1.3fr 1fr;grid-template-rows:1fr 1fr;gap:14px}
+.lc .wide{grid-column:1/-1}
+.rc{min-height:0;display:flex;flex-direction:column;gap:14px}
+.panel,.card.ch{display:flex;flex-direction:column}
+h2{margin:0;font-size:15px;font-weight:500}
+.cap{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+/* table */
+.tp{flex:0 1 auto}
+.tbl{display:flex;flex-direction:column;min-height:0}
+.rows{flex:0 1 auto;min-height:0;overflow-y:auto}
+.r{display:grid;grid-template-columns:var(--cols);gap:0 6px;align-items:center;padding:0 6px;text-align:right;border-bottom:1px solid var(--line);font-size:13px}
+.r>div:first-child{text-align:left}
+.r.g{height:40px}.r.k{height:30px;font-size:12.5px;background:#fafbfc}
+.r.k .nm{padding-left:26px;color:#3b4756}
+.r.h{padding:4px 6px;font-size:11px;line-height:1.15;overflow-wrap:anywhere;color:var(--mute);align-items:end}
+.r.h>div{cursor:pointer;user-select:none}.r.h>div.on{color:var(--ink);font-weight:500}.r.h>div:last-child{cursor:default}
+.r.f{padding:10px 6px 4px;font-weight:700;border-top:1px solid var(--ink);border-bottom:0}
+.r.g.e{cursor:pointer}.r.g.e:hover{background:#f5f8fb}.r.g.o{background:#fbf8ef}
+.tg{display:inline-block;width:18px;height:18px;line-height:15px;text-align:center;border:1px solid var(--line);border-radius:4px;margin-right:8px;font-size:14px;color:var(--mute);background:#fff;vertical-align:middle}
+.tg:empty{border-color:transparent;background:none}
+.r .bar{height:8px}
+.zero{color:#b4bcc6}
+.info{font-size:12px;color:var(--mute);cursor:help}
+/* charts */
+.donut{flex:1;min-height:0;display:flex;align-items:center;gap:14px}
+.donut svg{flex:none;height:100%;max-height:260px;aspect-ratio:1}
+.dl span{white-space:nowrap}
+.dl{flex:1;min-width:0;font-size:13px;display:flex;flex-direction:column;justify-content:center;gap:11px}
+.dl div{display:flex;gap:8px;align-items:flex-start}.dl small{display:block;font-size:11.5px;color:var(--mute);opacity:.85}.dl b{margin-left:auto;font-weight:700}.dl span{color:var(--mute)}
+.dl .z{opacity:.4}
+.plot{position:relative;flex:1;min-height:0;margin-bottom:4px}
+.grs{position:absolute;inset:18px 0 0 0;display:flex;border-bottom:1px solid var(--ink)}
+.gr{flex:1;display:flex;justify-content:center;gap:4px}
+.bw{position:relative;width:min(30px,22%)}
+.bv{position:absolute;left:0;right:0;bottom:0;border-radius:3px 3px 0 0;min-height:1px}
+.bv span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--mute)}
+.gl{flex:none;display:flex}.gl div{flex:1;min-width:0;padding:0 2px;text-align:center;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg{flex:none;display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--mute);margin-top:6px}
+.rk{flex:1;min-height:0;display:flex;flex-direction:column}
+.rkr{flex:1 1 0;min-height:0;max-height:38px;display:grid;grid-template-columns:150px 1fr 56px;gap:12px;align-items:center;font-size:13px}
+.rkr .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rkr .n small{color:var(--mute);font-size:11px;margin-left:5px}
+.rkr .t{display:flex;height:10px;border-radius:5px;overflow:hidden}
+.rkr .c{text-align:right;color:var(--mute)}.rkr .c b{color:var(--ink)}
+.rings{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px;align-content:center;justify-items:center;overflow:hidden}
+.ring{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;min-width:0;text-align:center}
+.ring svg{width:min(112px,100%);height:auto;aspect-ratio:1;flex:none}
+.ring .rt{font-size:12px;color:var(--mute);line-height:1.4;min-width:0;width:100%}.ring .rt b{display:block;font-size:14px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1100px){html,body{height:auto}body{overflow:auto}.wrap{height:auto}.top,.main,.lc{grid-template-columns:1fr}.lc{grid-template-rows:none}.lc>*{min-height:260px}.rings{flex-wrap:wrap}}
+
+/* ---- glass theme ---- */
+body{background:
+ radial-gradient(50% 45% at 12% 8%,rgba(255,255,255,.95),transparent 70%),
+ radial-gradient(40% 40% at 88% 12%,rgba(214,230,246,.5),transparent 70%),
+ radial-gradient(40% 45% at 6% 90%,rgba(214,240,232,.45),transparent 70%),
+ radial-gradient(44% 40% at 75% 95%,rgba(228,224,246,.4),transparent 70%),
+ linear-gradient(135deg,#fcfdfe,#f0f3f7 60%,#e8edf3);background-attachment:fixed}
+.card,.panel{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);
+ border:1px solid rgba(255,255,255,.6);border-radius:24px;padding:18px 22px;
+ box-shadow:0 10px 36px rgba(40,55,75,.12),inset 0 1px 0 rgba(255,255,255,.7)}
+h1{font-size:24px}
+button{border-radius:999px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.75);padding:6px 16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+button:hover{background:rgba(255,255,255,.85)}
+.msg{border-radius:14px}
+.big b{font-size:36px;font-weight:500}
+.bar{background:rgba(255,255,255,.55);box-shadow:inset 0 1px 2px rgba(40,55,75,.08)}
+.step{border-top:0}
+.step .t::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:8px;vertical-align:1px}
+#steps .step:nth-child(2){background:rgba(27,36,48,.9);border-color:rgba(255,255,255,.14);color:#fff}
+#steps .step:nth-child(2) .v small{color:rgba(255,255,255,.6)}
+#steps .step:nth-child(2) .bar{background:rgba(255,255,255,.16);box-shadow:none}
+.r{border-bottom:1px solid rgba(40,55,75,.08)}
+.r.k{background:rgba(255,255,255,.28)}
+.r.g.e:hover{background:rgba(255,255,255,.4)}
+.r.g.o{background:rgba(255,255,255,.45)}
+.r.f{border-top:1px solid rgba(27,36,48,.5)}
+.tg{background:rgba(255,255,255,.7);border-radius:8px;border-color:rgba(40,55,75,.15)}
+.bv{border-radius:10px 10px 3px 3px}
+.rkr .t{background:rgba(255,255,255,.35)}
+.zero{color:#b4bcc6}
+.r.k.e{cursor:pointer}.r.k.e:hover{background:rgba(255,255,255,.5)}.r.k.o{background:rgba(255,255,255,.6)}
+.r.k.e:hover .nm{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.mo{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(236,241,247,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mo[hidden]{display:none}
+.mp{width:min(1040px,100%);max-height:84vh;display:flex;flex-direction:column;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.95);border-radius:24px;padding:20px 24px;box-shadow:0 24px 64px rgba(30,40,60,.18)}
+.mh{flex:none;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.mh h3{margin:0;font-size:18px;font-weight:500}
+.mb{overflow:auto;min-height:0}
+.mt{width:100%;border-collapse:collapse;font-size:13px}
+.mt th{position:sticky;top:0;background:rgba(247,249,252,.97);text-align:left;font-weight:500;color:var(--mute);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.mt td{padding:9px 10px;border-bottom:1px solid rgba(40,55,75,.07);vertical-align:top}
+.mt tr:hover td{background:rgba(255,255,255,.7)}
+.mt .n{color:var(--mute);width:36px}
+.mt .nw{white-space:nowrap}
+.me{padding:28px 0;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>คำขออนุญาตทำประโยชน์ในเขตป่าชายเลน</h1>
+    <div class="sub" id="stamp">ยังไม่ได้โหลดข้อมูล</div>
+  </div>
+</header>
+<div class="msg" id="msg"></div>
+<div class="mo" id="mo" hidden><div class="mp"><div class="mh"><div><h3 id="mt"></h3><div class="sub" id="ms"></div></div><button type="button" id="mx">ปิด</button></div><div class="mb" id="mbody"></div></div></div>
+
+<section class="top">
+  <div class="card">
+    <div class="split" id="sum"></div>
+    <div class="bar" id="sumbar"></div>
+    <div class="legend">
+      <span><em style="background:var(--none)"></em>ยังไม่มีคำขอ</span>
+      <span><em style="background:var(--s0)"></em>มีคำขอ ยังไม่ผ่านขั้นตอนใด</span>
+      <span><em style="background:var(--s1)"></em>ถึงขั้น แขวงดำเนินการยื่นคำขอ</span>
+      <span><em style="background:var(--s2)"></em>ถึงขั้น ยื่นคำขอต่ออธิบดีฯ</span>
+    </div>
+  </div>
+  <div id="steps" style="display:contents"></div>
+</section>
+
+<section class="main">
+  <div class="lc">
+    <div class="card ch"><div class="cap"><h2>สถานะรายการทั้งหมด</h2></div><div class="donut" id="c1"></div></div>
+    <div class="card ch"><div class="cap"><h2>แขวงที่มีคำขอมากที่สุด</h2><span class="sub" id="c3s"></span></div><div class="rk" id="c3"></div><div class="lg"><span><em style="background:var(--s2)"></em>ยื่นคำขอต่ออธิบดีฯ แล้ว</span><span><em style="background:var(--s0)"></em>ยังไม่ยื่นต่ออธิบดีฯ</span></div></div>
+    <div class="card ch wide"><div class="cap"><h2>เปรียบเทียบรายสทล.</h2><span class="sub">จำนวนรายการ</span></div><div class="plot" id="c2"></div><div class="gl" id="c2l"></div><div class="lg" id="c2g"></div></div>
+  </div>
+  <div class="rc">
+    <div class="panel tp">
+      <div class="cap"><h2>รายสทล. / รายแขวง</h2><div class="tools"><span class="sub">กด + เพื่อดูรายแขวง · กดชื่อแขวงเพื่อดูรายการคำขอ</span><button id="allbtn">ขยายทั้งหมด</button></div></div>
+      <div class="tbl" id="tbl"></div>
+    </div>
+    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่ยื่นคำขอต่ออธิบดีฯ แล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ</span></div><div class="rings" id="c4"></div></div>
+  </div>
+</section>
+</div>
+
+<script>
+/* คอลัมน์ (เริ่มนับ 0: A=0) */
+const COL={base:[6,7,8,9,10,11],req:13,stl:21,stl2:20,khw:22,steps:[27,28]};
+/* วาง URL ของ Web App (ลงท้ายด้วย /exec) หลัง Deploy Apps Script */
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycbwGJrFL1qzYhi8BnCl9a_Arzm9B5c-0wQoO4Ad0Nbndptly3XV5sKDpP1rdRhYjhfxSIQ/exec';
+const NR='ยังไม่ได้ยื่นคำขอ';
+const STEPS=['แขวงดำเนินการยื่นคำขอ','ยื่นคำขอต่ออธิบดีกรมรัพยากรทางทะเลและชายฝั่ง'];
+const SHORT=['แขวงดำเนินการยื่นคำขอ','ยื่นคำขอต่ออธิบดีฯ'];
+const SEG=['--none','--s0','--s1','--s2'];
+const $=id=>document.getElementById(id);
+const clean=v=>(v==null?'':String(v).trim());
+const done=v=>{v=clean(v).toLowerCase();return v!==''&&v!=='0'&&v!=='false'};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>n.toLocaleString('th-TH');
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const short=n=>n.replace(/^กองทางหลวงพิเศษระหว่างเมือง$/,'ทล.พิเศษ');
+const SP=/พิเศษระหว่างเมือง/;
+const nat=(a,b)=>a.localeCompare(b,'th',{numeric:true});
+let ROWS=[],GR=[],T=null,SORT=['name',1],OPEN=new Set();
+
+function parseCSV(t){const rows=[];let r=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c=='"')q=true;else if(c==','){r.push(f);f=''}
+  else if(c=='\n'){r.push(f);rows.push(r);r=[];f=''}else if(c!='\r')f+=c}
+ if(f||r.length){r.push(f);rows.push(r)}return rows}
+
+function msg(t){const m=$('msg');m.textContent=t||'';m.style.display=t?'block':'none'}
+
+async function load(){
+ $('stamp').textContent='กำลังโหลด…';
+ try{const r=await fetch(WEBAPP_URL);if(!r.ok)throw 0;const j=await r.json();if(!j.values)throw 0;ingestRows(j.values)}
+ catch(e){msg('ดึงข้อมูลจาก Apps Script ไม่ได้ — ตรวจว่า Deploy เป็น Web App แล้ว และตั้ง Who has access = Anyone');$('stamp').textContent='โหลดไม่สำเร็จ'}
+}
+function ingest(text){ingestRows(parseCSV(text))}
+function ingestRows(all){
+ const chk=COL.base.concat(COL.req);
+ ROWS=all.slice(1).filter(r=>chk.some(i=>clean(r[i])));
+ msg('');
+ $('stamp').textContent='อัปเดตล่าสุด '+new Date().toLocaleString('th-TH')+' · '+fmt(ROWS.length)+' รายการ';
+ render();
+}
+
+function model(r){
+ const hasReq=clean(r[COL.req])!=='';
+ const s=COL.steps.map(i=>done(r[i]));
+ let stage=0;s.forEach((d,i)=>{if(d)stage=i+1});
+ return{raw:r,hasReq,s,stage,
+  stl:clean(r[COL.stl])||clean(r[COL.stl2])||'ไม่มีข้อมูลสทล.',
+  khw:clean(r[COL.khw])||'ไม่มีข้อมูลแขวง'}}
+function blank(){return{total:0,noReq:0,req:0,s:[0,0],at:[0,0,0]}}
+function add(a,m){a.total++;if(!m.hasReq){a.noReq++;return}
+ a.req++;m.s.forEach((d,i)=>{if(d)a.s[i]++});a.at[m.stage]++}
+function stack(a){
+ const parts=[a.noReq,a.at[0],a.at[1],a.at[2]];
+ return '<div class="bar">'+parts.map((n,i)=>n?`<i style="width:${n/a.total*100}%;background:var(${SEG[i]})" title="${n}"></i>`:'').join('')+'</div>'}
+
+function render(){
+ const M=ROWS.map(model);T=blank();M.forEach(m=>add(T,m));
+ $('sum').innerHTML=`<div class="big"><b>${fmt(T.total)}</b><span>รายการทั้งหมด</span></div>
+  <div class="big"><b style="color:var(--s2)">${fmt(T.req)}</b><span>มีคำขอแล้ว (${pct(T.req,T.total)}%)</span></div>
+  <div class="big"><b style="color:var(--mute)">${fmt(T.noReq)}</b><span>ยังไม่มีคำขอ (${pct(T.noReq,T.total)}%)</span></div>`;
+ $('sumbar').innerHTML=T.total?stack(T).replace('<div class="bar">','').replace(/<\/div>$/,''):'';
+ $('steps').innerHTML=[0,1].map(i=>`<div class="card step" style="--c:var(${SEG[i+2]})">
+  <div class="t">${esc(STEPS[i])}</div>
+  <div class="v">${fmt(T.s[i])}<small>จาก ${fmt(T.req)} (${pct(T.s[i],T.req)}%)</small></div>
+  <div class="bar"><i style="width:${pct(T.s[i],T.req)}%"></i></div></div>`).join('');
+ const g={};
+ M.forEach(m=>{const G=(g[m.stl]??={...blank(),name:m.stl,k:{}});add(G,m);
+  const K=(G.k[m.khw]??={...blank(),name:m.khw,stl:m.stl,items:[]});add(K,m);K.items.push(m)});
+ GR=Object.values(g);GR.forEach(x=>x.kids=Object.values(x.k));
+ drawTable();drawCharts();
+}
+
+/* ---------- ตาราง ---------- */
+function val(x,k){return (k.length==2&&k[0]=='s')?x.s[+k[1]-1]:x[k]}
+function sortRows(rows){const [k,d]=SORT;
+ const o=rows.slice().sort((a,b)=>{const A=val(a,k),B=val(b,k);
+  const c=typeof A=='string'?nat(A,B):A-B;return c*d||nat(a.name,b.name)});
+ return o.filter(x=>!SP.test(x.name)).concat(o.filter(x=>SP.test(x.name)))}
+function hdr(){
+ const [k,d]=SORT;
+ const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','ยังไม่มีคำขอ'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
+ return '<div class="r h">'+L.map(([key,t])=>`<div class="${k==key?'on':''}" data-k="${key}">${esc(t)}${k==key?(d>0?' ▲':' ▼'):''}</div>`).join('')+'<div></div></div>'}
+function rowHTML(x,o){
+ const z=n=>n?fmt(n):'<span class="zero">0</span>';
+ const nm=o.kid?esc(x.name):`<span class="tg">${o.exp?(o.open?'−':'+'):''}</span>${esc(x.name)}`;
+ const at=o.kid?`data-kid="${esc(x.stl+'|'+x.name)}"`:(o.exp?`data-g="${esc(x.name)}"`:'');
+ return `<div class="r ${o.kid?'k e':'g'} ${(!o.kid&&o.exp)?'e':''} ${o.open?'o':''}" ${at}>
+  <div class="nm">${nm}</div><div>${fmt(x.total)}</div><div>${z(x.noReq)}</div><div>${z(x.req)}</div>
+  <div>${z(x.s[0])}</div><div>${z(x.s[1])}</div><div>${stack(x)}</div></div>`}
+const one=v=>clean(v).replace(/\s*\n\s*/g,' · ');
+function foot(){
+ const a=T;
+ return `<div class="r f"><div>รวม</div><div>${fmt(a.total)}</div><div>${fmt(a.noReq)}</div><div>${fmt(a.req)}</div><div>${fmt(a.s[0])}</div><div>${fmt(a.s[1])}</div><div></div></div>`}
+const expandable=x=>x.kids.length>1||x.kids[0].name!==x.name;
+const MCOLS=[['ลำดับคำขออนุญาต',19],['สทล.',21],['แขวง',22],['ประเภท (ทางหลวง / ที่ดินสงวน)',23],['หมายเลขทางหลวง',24],['กม.เริ่มต้น',25],['กม.สิ้นสุด',26]];
+function showKid(key){
+ const k=GR.flatMap(g=>g.kids).find(x=>x.stl+'|'+x.name===key);if(!k)return;
+ const it=k.items.filter(m=>m.hasReq);
+ $('mt').textContent=k.name;
+ $('ms').textContent=k.stl+' · มีคำขอ '+fmt(it.length)+' จาก '+fmt(k.total)+' รายการ';
+ $('mbody').innerHTML=it.length?'<table class="mt"><thead><tr><th>#</th>'+MCOLS.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
+  it.map((m,i)=>'<tr><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[1]>=24?'nw':''}">${esc(one(m.raw[c[1]]))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
+  :'<div class="me">ยังไม่มีคำขอในแขวงนี้</div>';
+ $('mo').hidden=false;
+}
+const closeM=()=>{$('mo').hidden=true};
+function drawTable(){
+ const old=$('tbl').querySelector('.rows'),st=old?old.scrollTop:0;
+ const rows=[...sortRows(GR.filter(x=>x.name!==NR)),...GR.filter(x=>x.name===NR)];
+ let h='';
+ rows.forEach(x=>{const exp=expandable(x),open=exp&&OPEN.has(x.name);
+  h+=rowHTML(x,{exp,open});
+  if(open)h+=sortRows(x.kids).map(k=>rowHTML(k,{kid:true})).join('')});
+ $('tbl').innerHTML=hdr()+`<div class="rows">${h}</div>`+foot();
+ const nr=$('tbl').querySelector('.rows');if(nr)nr.scrollTop=st;
+ const ex=GR.filter(expandable);
+ $('allbtn').textContent=ex.length&&ex.every(x=>OPEN.has(x.name))?'ย่อทั้งหมด':'ขยายทั้งหมด';
+}
+
+/* ---------- ชาร์ต ---------- */
+function ring(R,w,size,frac,col,txt,sub){
+ const C=2*Math.PI*R,l=Math.max(0,Math.min(1,frac))*C,c=size/2;
+ return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="rgba(40,55,75,.12)" stroke-width="${w}"/>
+ ${l?`<circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="${col}" stroke-width="${w}" stroke-dasharray="${l} ${C-l}" transform="rotate(-90 ${c} ${c})"/>`:''}
+ <text x="${c}" y="${c+(sub?-2:6)}" text-anchor="middle" font-size="${size>120?26:19}" font-weight="700" fill="#1b2430">${txt}</text>
+ ${sub?`<text x="${c}" y="${c+16}" text-anchor="middle" font-size="11" fill="#7a8694">${sub}</text>`:''}</svg>`}
+
+function donut(parts){
+ const R=52,C=2*Math.PI*R,tot=parts.reduce((a,p)=>a+p.n,0)||1;let off=0;
+ const arcs=parts.filter(p=>p.n).map(p=>{const l=p.n/tot*C;
+  const s=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="var(${p.c})" stroke-width="22" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`;off+=l;return s}).join('');
+ return `<svg viewBox="0 0 140 140">${arcs}<text x="70" y="68" text-anchor="middle" font-size="26" font-weight="700" fill="#1b2430">${pct(T.req,T.total)}%</text><text x="70" y="86" text-anchor="middle" font-size="11" fill="#7a8694">มีคำขอแล้ว</text></svg>`}
+
+function drawCharts(){
+ const G=GR.filter(x=>x.name!==NR).sort((a,b)=>(SP.test(a.name)-SP.test(b.name))||nat(a.name,b.name));
+ /* 1 โดนัต */
+ const P=[{n:T.noReq,c:'--none',l:'ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'มีคำขอ ยังไม่ยื่น'},
+  {n:T.at[1],c:'--s1',l:'แขวงยื่นคำขอแล้ว',s:'(แต่ยังไม่ได้ยื่นต่ออธิบดีฯ)'},{n:T.at[2],c:'--s2',l:'ยื่นต่ออธิบดีฯ แล้ว'}];
+ $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b>${fmt(p.n)}</b></div>`).join('')+'</div>';
+ /* 2 แท่งเปรียบเทียบรายสทล. */
+ const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total},{l:'มีคำขอ',c:'--req',f:x=>x.req},{l:SHORT[0],c:'--s1',f:x=>x.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1]}];
+ const mx=Math.max(1,...G.map(x=>x.total));
+ $('c2').innerHTML='<div class="grs">'+G.map(x=>'<div class="gr">'+SER.map(s=>{const v=s.f(x);
+  return `<div class="bw"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c})"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
+ $('c2l').innerHTML=G.map(x=>`<div title="${esc(x.name)}">${esc(short(x.name))}</div>`).join('');
+ $('c2g').innerHTML=SER.map(s=>`<span><em style="background:var(${s.c})"></em>${esc(s.l)}</span>`).join('');
+ /* 3 อันดับแขวง */
+ const K=G.flatMap(x=>x.kids).sort((a,b)=>b.req-a.req||nat(a.name,b.name));
+ const top=K.slice(0,8),m3=Math.max(1,...top.map(x=>x.req));
+ $('c3s').textContent=K.length>8?`8 อันดับแรกจาก ${K.length} แขวง`:`${K.length} แขวง`;
+ $('c3').innerHTML=top.map(x=>`<div class="rkr"><div class="n">${esc(x.name)}<small>${esc(x.stl)}</small></div>
+  <div class="t"><i style="width:${x.at[2]/m3*100}%;background:var(--s2)"></i><i style="width:${(x.req-x.at[2])/m3*100}%;background:var(--s0)"></i></div>
+  <div class="c"><b>${x.at[2]}</b>/${x.req}</div></div>`).join('');
+ /* 4 วงแหวนรายสทล. */
+ $('c4').innerHTML=G.map(x=>`<div class="ring">${ring(38,9,96,x.req?x.at[2]/x.req:0,'var(--s2)',x.req?pct(x.at[2],x.req)+'%':'–')}
+  <div class="rt"><b title="${esc(x.name)}">${esc(short(x.name))}</b>${x.at[2]} / ${x.req} คำขอ</div></div>`).join('');
+}
+
+document.addEventListener('click',e=>{
+ const th=e.target.closest('.r.h [data-k]');
+ if(th){const k=th.dataset.k;SORT=[k,SORT[0]==k?-SORT[1]:1];drawTable();return}
+ const kr=e.target.closest('.r.k[data-kid]');
+ if(kr){showKid(kr.dataset.kid);return}
+ if(e.target.id==='mo'||e.target.id==='mx'){closeM();return}
+ const tr=e.target.closest('.r.g[data-g]');
+ if(tr){const n=tr.dataset.g;OPEN.has(n)?OPEN.delete(n):OPEN.add(n);drawTable()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+$('allbtn').onclick=()=>{const ex=GR.filter(expandable);
+ if(ex.every(x=>OPEN.has(x.name)))OPEN.clear();else ex.forEach(x=>OPEN.add(x.name));drawTable()};
+load();
+setInterval(load,5*60*1000);
+</script>
+</body>
+</html>
