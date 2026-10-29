@@ -62,9 +62,9 @@ h2{margin:0;font-size:15px;font-weight:500}
 /* charts */
 .donut{flex:1;min-height:0;display:flex;align-items:center;gap:14px}
 .donut svg{flex:none;height:100%;max-height:260px;aspect-ratio:1}
-.dl span{white-space:nowrap}
+.dl div>span{min-width:0;flex:1 1 auto;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
 .dl{flex:1;min-width:0;font-size:13px;display:flex;flex-direction:column;justify-content:center;gap:11px}
-.dl div{display:flex;gap:8px;align-items:flex-start}.dl small{display:block;font-size:11.5px;color:var(--mute);opacity:.85}.dl b{margin-left:auto;font-weight:700}.dl span{color:var(--mute)}
+.dl div{display:flex;gap:8px;align-items:flex-start}.dl small{display:block;font-size:11.5px;color:var(--mute);opacity:.85}.dl b{margin-left:auto;padding-left:6px;flex:none;font-weight:700}.dl span{color:var(--mute)}
 .dl .z{opacity:.4}
 .plot{position:relative;flex:1;min-height:0;margin-bottom:4px}
 .grs{position:absolute;inset:18px 0 0 0;display:flex;border-bottom:1px solid var(--ink)}
@@ -103,7 +103,7 @@ button:hover{background:rgba(255,255,255,.85)}
 .bar{background:rgba(255,255,255,.55);box-shadow:inset 0 1px 2px rgba(40,55,75,.08)}
 .step{border-top:0}
 .step .t::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:8px;vertical-align:1px}
-#steps .step:nth-child(2){background:rgba(27,36,48,.9);border-color:rgba(255,255,255,.14);color:#fff}
+#steps .step:nth-child(2){background:rgba(38,70,115,.94);border-color:rgba(255,255,255,.14);color:#fff}
 #steps .step:nth-child(2) .v small{color:rgba(255,255,255,.6)}
 #steps .step:nth-child(2) .bar{background:rgba(255,255,255,.16);box-shadow:none}
 .r{border-bottom:1px solid rgba(40,55,75,.08)}
@@ -129,6 +129,14 @@ button:hover{background:rgba(255,255,255,.85)}
 .mt tr:hover td{background:rgba(255,255,255,.7)}
 .mt .n{color:var(--mute);width:36px}
 .mt .nw{white-space:nowrap}
+.mlg{flex:none;display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);margin:0 0 10px}
+.mlg .lh{color:var(--ink);font-weight:500}
+.mlg .it{display:inline-flex;align-items:center;gap:6px}
+.mlg em{display:inline-block;width:12px;height:12px;border-radius:3px}
+.mlg b{color:var(--ink);font-weight:700}
+.mt tr.st td{background:color-mix(in srgb,var(--c) 28%,transparent)}
+.mt tr.st td:first-child{box-shadow:inset 4px 0 0 var(--c)}
+.mt tr.st:hover td{background:color-mix(in srgb,var(--c) 42%,transparent)}
 .me{padding:28px 0;text-align:center;color:var(--mute)}
 
 /* ---- motion ---- */
@@ -177,17 +185,17 @@ body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s
   </div>
 </header>
 <div class="msg" id="msg"></div>
-<div class="mo" id="mo" hidden><div class="mp"><div class="mh"><div><h3 id="mt"></h3><div class="sub" id="ms"></div></div><button type="button" id="mx">ปิด</button></div><div class="mb" id="mbody"></div></div></div>
+<div class="mo" id="mo" hidden><div class="mp"><div class="mh"><div><h3 id="mt"></h3><div class="sub" id="ms"></div></div><button type="button" id="mx">ปิด</button></div><div class="mlg" id="mlg"></div><div class="mb" id="mbody"></div></div></div>
 
 <section class="top">
   <div class="card">
     <div class="split" id="sum"></div>
     <div class="bar" id="sumbar"></div>
     <div class="legend">
-      <span><em style="background:var(--none)"></em>ยังไม่มีคำขอ</span>
-      <span><em style="background:var(--s0)"></em>มีคำขอ ยังไม่ผ่านขั้นตอนใด</span>
-      <span><em style="background:var(--s1)"></em>ถึงขั้น แขวงดำเนินการยื่นคำขอ</span>
-      <span><em style="background:var(--s2)"></em>ถึงขั้น ยื่นคำขอต่ออธิบดีฯ</span>
+      <span><em style="background:var(--none)"></em>(1.1) ยังไม่มีคำขอ</span>
+      <span><em style="background:var(--s0)"></em>(1.2) มีคำขอ ยังไม่ยื่น</span>
+      <span><em style="background:var(--s1)"></em>(2) แขวงส่งเอกสารให้กลุ่มงาน สวล.</span>
+      <span><em style="background:var(--s2)"></em>(3) กลุ่มงาน สวล. ส่งเรื่องเข้ากระทรวง</span>
     </div>
   </div>
   <div id="steps" style="display:contents"></div>
@@ -196,7 +204,7 @@ body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s
 <section class="main">
   <div class="lc">
     <div class="card ch"><div class="cap"><h2>สถานะรายการทั้งหมด</h2></div><div class="donut" id="c1"></div></div>
-    <div class="card ch"><div class="cap"><h2>แขวงที่มีคำขอมากที่สุด</h2><span class="sub" id="c3s"></span></div><div class="rk" id="c3"></div><div class="lg"><span><em style="background:var(--s2)"></em>ยื่นคำขอต่ออธิบดีฯ แล้ว</span><span><em style="background:var(--s0)"></em>ยังไม่ยื่นต่ออธิบดีฯ</span></div></div>
+    <div class="card ch"><div class="cap"><h2>แขวงที่มีคำขอมากที่สุด</h2><span class="sub" id="c3s"></span></div><div class="rk" id="c3"></div><div class="lg"><span><em style="background:var(--s2)"></em>(3) กลุ่มงาน สวล. ส่งเรื่องเข้ากระทรวง</span><span><em style="background:var(--s0)"></em>ยังไม่ส่งเรื่องเข้ากระทรวง</span></div></div>
     <div class="card ch wide"><div class="cap"><h2>เปรียบเทียบรายสทล.</h2><span class="sub">จำนวนรายการ</span></div><div class="plot" id="c2"></div><div class="gl" id="c2l"></div><div class="lg" id="c2g"></div></div>
   </div>
   <div class="rc">
@@ -204,7 +212,7 @@ body.intro .donut svg circle,body.intro .ring circle+circle{animation:sweep 1.3s
       <div class="cap"><h2>รายสทล. / รายแขวง</h2><div class="tools"><span class="sub">กด + เพื่อดูรายแขวง · กดชื่อแขวงเพื่อดูรายการคำขอ</span><button id="allbtn">ขยายทั้งหมด</button></div></div>
       <div class="tbl" id="tbl"></div>
     </div>
-    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่ยื่นคำขอต่ออธิบดีฯ แล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ</span></div><div class="rings" id="c4"></div></div>
+    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่กลุ่มงาน สวล. ส่งเรื่องเข้ากระทรวงแล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ</span></div><div class="rings" id="c4"></div></div>
   </div>
 </section>
 </div>
@@ -215,8 +223,8 @@ const COL={base:[6,7,8,9,10,11],req:13,stl:21,stl2:20,khw:22,steps:[27,28]};
 /* วาง URL ของ Web App (ลงท้ายด้วย /exec) หลัง Deploy Apps Script */
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycbwGJrFL1qzYhi8BnCl9a_Arzm9B5c-0wQoO4Ad0Nbndptly3XV5sKDpP1rdRhYjhfxSIQ/exec';
 const NR='ยังไม่ได้ยื่นคำขอ';
-const STEPS=['แขวงดำเนินการยื่นคำขอ','ยื่นคำขอต่ออธิบดีกรมรัพยากรทางทะเลและชายฝั่ง'];
-const SHORT=['แขวงดำเนินการยื่นคำขอ','ยื่นคำขอต่ออธิบดีฯ'];
+const STEPS=['(2) แขวงส่งเอกสารให้กลุ่มงาน สวล.','(3) กลุ่มงาน สวล. ส่งเรื่องเข้ากระทรวง'];
+const SHORT=STEPS;
 const SEG=['--none','--s0','--s1','--s2'];
 const $=id=>document.getElementById(id);
 const clean=v=>(v==null?'':String(v).trim());
@@ -303,7 +311,7 @@ function sortRows(rows){const [k,d]=SORT;
  return o.filter(x=>!SP.test(x.name)).concat(o.filter(x=>SP.test(x.name)))}
 function hdr(){
  const [k,d]=SORT;
- const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','ยังไม่มีคำขอ'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
+ const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','(1.1) ยังไม่มีคำขอ'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
  return '<div class="r h">'+L.map(([key,t])=>`<div class="${k==key?'on':''}" data-k="${key}">${esc(t)}${k==key?(d>0?' ▲':' ▼'):''}</div>`).join('')+'<div></div></div>'}
 function rowHTML(x,o){
  const z=n=>n?fmt(n):'<span class="zero">0</span>';
@@ -323,8 +331,10 @@ function showKid(key){
  const it=k.items.filter(m=>m.hasReq);
  $('mt').textContent=k.name;
  $('ms').textContent=k.stl+' · มีคำขอ '+fmt(it.length)+' จาก '+fmt(k.total)+' รายการ';
+ const cn=[0,0,0];it.forEach(m=>cn[m.stage]++);
+ $('mlg').innerHTML=it.length?'<span class="lh">คำขอนี้อยู่ขั้นตอนไหน:</span>'+[['(1.2) มีคำขอ ยังไม่ยื่น',1],[STEPS[0],2],[STEPS[1],3]].map((x,i)=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[i]}</b></span>`).join(''):'';
  $('mbody').innerHTML=it.length?'<table class="mt"><thead><tr><th>#</th>'+MCOLS.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
-  it.map((m,i)=>'<tr><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[1]>=24?'nw':''}">${esc(one(m.raw[c[1]]))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
+  it.map((m,i)=>'<tr class="st" style="--c:var('+SEG[m.stage+1]+')"><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[1]>=24?'nw':''}">${esc(one(m.raw[c[1]]))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
   :'<div class="me">ยังไม่มีคำขอในแขวงนี้</div>';
  $('mo').hidden=false;
 }
@@ -362,8 +372,8 @@ function donut(parts){
 function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>(SP.test(a.name)-SP.test(b.name))||nat(a.name,b.name));
  /* 1 โดนัต */
- const P=[{n:T.noReq,c:'--none',l:'ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'มีคำขอ ยังไม่ยื่น'},
-  {n:T.at[1],c:'--s1',l:'แขวงยื่นคำขอแล้ว',s:'(แต่ยังไม่ได้ยื่นต่ออธิบดีฯ)'},{n:T.at[2],c:'--s2',l:'ยื่นต่ออธิบดีฯ แล้ว'}];
+ const P=[{n:T.noReq,c:'--none',l:'(1.1) ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'(1.2) มีคำขอ ยังไม่ยื่น'},
+  {n:T.at[1],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.at[2],c:'--s2',l:STEPS[1]}];
  $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
  const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total},{l:'มีคำขอ',c:'--req',f:x=>x.req},{l:SHORT[0],c:'--s1',f:x=>x.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1]}];
