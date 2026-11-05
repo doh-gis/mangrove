@@ -450,7 +450,7 @@ function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>nat(a.name,b.name));
  /* 1 โดนัต */
  const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.'},
-  {n:T.at[1],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.at[2],c:'--s2',l:STEPS[1]}];
+  {n:T.s[0],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.s[1],c:'--s2',l:STEPS[1]}];
  $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
  const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.hasReq&&m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.hasReq&&m.s[1]}];SERS=SER;;
