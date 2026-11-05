@@ -347,8 +347,9 @@ function model(r){
   stl:clean(r[COL.stl])||clean(r[COL.stl2])||'ไม่มีข้อมูลสทล.',
   khw:clean(r[COL.khw])||'ไม่มีข้อมูลแขวง'}}
 function blank(){return{total:0,noReq:0,req:0,s:[0,0],at:[0,0,0]}}
-function add(a,m){a.total++;if(!m.hasReq){a.noReq++;return}
- a.req++;m.s.forEach((d,i)=>{if(d)a.s[i]++});a.at[m.stage]++}
+function add(a,m){a.total++;m.s.forEach((d,i)=>{if(d)a.s[i]++}); /* นับ AB/AC ทุกแถวที่มีค่า แม้ T ว่าง */
+ if(!m.hasReq){a.noReq++;return}
+ a.req++;a.at[m.stage]++}
 function stack(a){
  const parts=[a.noReq,a.at[0],a.at[1],a.at[2]];
  return '<div class="bar">'+parts.map((n,i)=>n?`<i style="width:${n/a.total*100}%;background:var(${SEG[i]})" title="${n}"></i>`:'').join('')+'</div>'}
