@@ -348,17 +348,17 @@ function model(r){
   khw:clean(r[COL.khw])||'ไม่มีข้อมูลแขวง'}}
 function blank(){return{total:0,noReq:0,req:0,s:[0,0],at:[0,0,0]}}
 function add(a,m){a.total++;m.s.forEach((d,i)=>{if(d)a.s[i]++}); /* นับ AB/AC ทุกแถวที่มีค่า แม้ T ว่าง */
- if(!m.hasReq){a.noReq++;return}
+ if(!m.hasReq){if(!m.s[0])a.noReq++;return}
  a.req++;a.at[m.stage]++}
 function stack(a){
- const parts=[a.noReq,a.at[0],a.at[1],a.at[2]];
+ const parts=[a.noReq,a.at[0],a.s[0],a.s[1]];
  return '<div class="bar">'+parts.map((n,i)=>n?`<i style="width:${n/a.total*100}%;background:var(${SEG[i]})" title="${n}"></i>`:'').join('')+'</div>'}
 
 function render(){
  const M=ROWS.map(model);T=blank();M.forEach(m=>add(T,m));
  $('sum').innerHTML=`<div class="big"><b data-n="${T.total}">${fmt(T.total)}</b><span>รายการทั้งหมด</span></div>
   <div class="big"><b style="color:var(--s2)" data-n="${T.req}">${fmt(T.req)}</b><span>มีคำขอแล้ว (${pct(T.req,T.total)}%)</span></div>
-  <div class="big"><b style="color:var(--mute)" data-n="${T.noReq}">${fmt(T.noReq)}</b><span>ยังไม่มีคำขอ (${pct(T.noReq,T.total)}%)</span></div>`;
+  <div class="big"><b style="color:var(--mute)" data-n="${T.noReq}">${fmt(T.noReq)}</b><span>ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง (${pct(T.noReq,T.total)}%)</span></div>`;
   $('steps').innerHTML=[0,1].map(i=>`<div class="card step" style="--c:var(${SEG[i+2]})">
   <div class="t">${esc(STEPS[i])}</div>
   <div class="v"><span data-n="${T.s[i]}">${fmt(T.s[i])}</span><small>จาก ${fmt(T.req)} (${pct(T.s[i],T.req)}%)</small></div>
@@ -378,7 +378,7 @@ function sortRows(rows){const [k,d]=SORT;
  return o}
 function hdr(){
  const [k,d]=SORT;
- const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','(1) ยังไม่มีคำขอ'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
+ const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
  return '<div class="r h">'+L.map(([key,t])=>`<div class="${k==key?'on':''}" data-k="${key}">${esc(t)}${k==key?(d>0?' ▲':' ▼'):''}</div>`).join('')+'<div></div></div>'}
 function rowHTML(x,o){
  const z=n=>n?fmt(n):'<span class="zero">0</span>';
@@ -397,10 +397,10 @@ const MCOLS=[['ลำดับคำขออนุญาต',19],['สทล.',
 function mcell(m,c){let v=one(m.raw[c[1]]);if(v)return v;if(c[4])return c[4](m);
  if(c[2])HDR.forEach((h,j)=>{if(!v&&j!==c[1]&&clean(h).includes(c[2]))v=one(m.raw[j])});return v}
 function openList(title,sub,it){
- const ix=m=>m.hasReq?m.stage+1:0;
+ const ix=m=>(m.hasReq||m.s[0])?m.stage+1:0;
  $('mt').textContent=title;$('ms').textContent=sub;
  const cn=[0,0,0,0];it.forEach(m=>cn[ix(m)]++);
- $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[['(1) ยังไม่มีคำขอ',0],['(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',1],[STEPS[0],2],[STEPS[1],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
+ $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[['(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง',0],['(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',1],[STEPS[0],2],[STEPS[1],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
  $('mbody').innerHTML=it.length?'<table class="mt"><thead><tr><th>#</th>'+MCOLS.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
   it.map((m,i)=>'<tr class="st" style="--c:var('+SEG[ix(m)]+')"><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[3]?'nw':''}">${esc(mcell(m,c))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
   :'<div class="me">ไม่มีรายการ</div>';
@@ -449,11 +449,11 @@ function donut(parts){
 function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>nat(a.name,b.name));
  /* 1 โดนัต */
- const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.'},
+ const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.'},
   {n:T.s[0],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.s[1],c:'--s2',l:STEPS[1]}];
  $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
- const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.hasReq&&m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.hasReq&&m.s[1]}];SERS=SER;;
+ const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.s[1]}];SERS=SER;;
  const mx=Math.max(1,...G.map(x=>x.total));
  $('c2').innerHTML='<div class="grs">'+G.map((x,gi)=>'<div class="gr">'+SER.map((s,si)=>{const v=s.f(x);
   return `<div class="bw" data-g="${esc(x.name)}" data-s="${si}" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*4+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
