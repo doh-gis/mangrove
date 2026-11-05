@@ -396,11 +396,21 @@ function foot(){
  const a=T;
  return `<div class="r f"><div>รวม</div><div>${fmt(a.total)}</div><div>${fmt(a.g[0])}</div><div>${fmt(a.g[1])}</div><div>${fmt(a.g[2])}</div><div>${fmt(a.g[3])}</div><div></div></div>`}
 const expandable=x=>x.kids.length>1||x.kids[0].name!==x.name;
-const MCOLS=[['ลำดับคำขออนุญาต',19],['สทล.',21,0,0,m=>m.stl],['แขวง',22,0,0,m=>m.khw],['ประเภท (ทางหลวง / ที่ดินสงวน)',23,'ประเภท'],['หมายเลขทางหลวง',24,'หมายเลขทางหลวง',1],['ตอน',5,0,1],['กม.เริ่มต้น',25,'กม.เริ่มต้น',1],['กม.สิ้นสุด',26,'กม.สิ้นสุด',1]];
+const MCOLS=[['ลำดับคำขออนุญาต',19],['ประเภทป่า',10],['แขวง',22,0,0,m=>m.khw],['ประเภท (ทางหลวง / ที่ดินสงวน)',23,'ประเภท'],['หมายเลขทางหลวง',24,'หมายเลขทางหลวง',1],['ตอน',5,0,1],['กม.เริ่มต้น',25,'กม.เริ่มต้น',1],['กม.สิ้นสุด',26,'กม.สิ้นสุด',1]];
 /* ค่าในช่อง: ใช้คอลัมน์ของคำขอก่อน ถ้าว่าง (รายการที่ยังไม่มีคำขอ) ค่อยหาคอลัมน์อื่นที่ชื่อหัวคอลัมน์ตรงกัน */
 function mcell(m,c){let v=one(m.raw[c[1]]);if(v)return v;if(c[4])return c[4](m);
  if(c[2])HDR.forEach((h,j)=>{if(!v&&j!==c[1]&&clean(h).includes(c[2]))v=one(m.raw[j])});return v}
+/* เรียง แขวง > หมายเลขทางหลวง > กม.เริ่มต้น (อ่าน 20+000 เป็นตัวเลข) */
+function kmNum(s){const m=String(s).split(' · ')[0].match(/(\d+)\s*\+\s*(\d+)/);return m?(+m[1])*1000+(+m[2]):null}
+function cmpN(x,y){const a=x==null||x!==x,b=y==null||y!==y;return a&&b?0:a?1:b?-1:x-y}
+function cmpM(a,b){
+ const k=nat(mcell(a,MCOLS[2]),mcell(b,MCOLS[2]));if(k)return k;
+ const ha=mcell(a,MCOLS[4]),hb=mcell(b,MCOLS[4]);
+ const h=cmpN(parseFloat(ha),parseFloat(hb));if(h)return h;
+ const hs=nat(ha,hb);if(hs)return hs;
+ return cmpN(kmNum(mcell(a,MCOLS[6])),kmNum(mcell(b,MCOLS[6])))}
 function openList(title,sub,it){
+ it=it.slice().sort(cmpM);
  const ix=grp;
  $('mt').textContent=title;$('ms').textContent=sub;
  const cn=[0,0,0,0];it.forEach(m=>cn[ix(m)]++);
