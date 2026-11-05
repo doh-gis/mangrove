@@ -287,7 +287,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 <script>
 /* คอลัมน์ (เริ่มนับ 0: A=0) */
-const COL={base:[6,7,8,9,10,11],req:13,stl:21,stl2:20,khw:22,steps:[27,28]};
+const COL={base:[6,7,8,9,10,11],req:19,stl:21,stl2:20,khw:22,steps:[27,28]}; /* req=คอลัมน์ T (ลำดับคำขออนุญาต), steps[0]=AB, steps[1]=AC */
 /* วาง URL ของ Web App (ลงท้ายด้วย /exec) หลัง Deploy Apps Script */
 const WEBAPP_URL='https://script.google.com/macros/s/AKfycbwGJrFL1qzYhi8BnCl9a_Arzm9B5c-0wQoO4Ad0Nbndptly3XV5sKDpP1rdRhYjhfxSIQ/exec';
 const NR='ยังไม่ได้ยื่นคำขอ';
@@ -333,8 +333,7 @@ async function load(){
 function ingest(text){ingestRows(parseCSV(text))}
 function ingestRows(all){
  HDR=all[0]||[];
- const chk=COL.base.concat(COL.req);
- ROWS=all.slice(1).filter(r=>chk.some(i=>clean(r[i])));
+ ROWS=all.slice(1).filter(r=>r.some(v=>clean(v))); /* รายการทั้งหมด = ทุกแถวที่มีข้อมูลอย่างน้อย 1 ช่อง */
  msg('');
  $('stamp').textContent='อัปเดตล่าสุด '+new Date().toLocaleString('th-TH')+' · '+fmt(ROWS.length)+' รายการ';
  render();
