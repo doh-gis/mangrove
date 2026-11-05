@@ -8,7 +8,7 @@
 <style>
 :root{--bg:#e6d8c0;--panel:rgba(255,255,255,.4);--ink:#1b2430;--mute:#7a8694;--line:rgba(40,55,75,.12);
 --none:#d5d9de;--s0:#fbc896;--s1:#f07167;--s2:#00afb9;--s3:#00afb9;--req:#98a3b0;
---cols:minmax(120px,1.5fr) repeat(3,minmax(40px,.5fr)) repeat(2,minmax(68px,.9fr)) minmax(60px,1fr)}
+--cols:minmax(120px,1.5fr) minmax(46px,.55fr) repeat(4,minmax(66px,.9fr)) minmax(60px,1fr)}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 Sarabun,"Noto Sans Thai",sans-serif;overflow:hidden}
@@ -280,7 +280,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="cap"><h2>รายสทล. / รายแขวง</h2><div class="tools"><span class="sub">กด + เพื่อดูรายแขวง · กดชื่อแขวงเพื่อดูรายการคำขอ</span><button id="allbtn">ขยายทั้งหมด</button></div></div>
       <div class="tbl" id="tbl"></div>
     </div>
-    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่กลุ่มงานสิ่งแวดล้อมส่งเรื่องขอผ่อนผัน มติ ครม. เข้ากระทรวงแล้ว รายสทล.</h2><span class="sub">เทียบกับจำนวนคำขอ · กดวงแหวนเพื่อดูรายการ</span></div><div class="rings" id="c4"></div></div>
+    <div class="card ch" style="flex:1;min-height:270px"><div class="cap"><h2>อัตราที่กลุ่มงานสิ่งแวดล้อมส่งเรื่องขอผ่อนผัน มติ ครม. เข้ากระทรวงแล้ว รายสทล.</h2><span class="sub">เทียบกับรายการทั้งหมด · กดวงแหวนเพื่อดูรายการ</span></div><div class="rings" id="c4"></div></div>
   </div>
 </section>
 </div>
@@ -294,6 +294,8 @@ const NR='ยังไม่ได้ยื่นคำขอ';
 const STEPS=['(3) ส่งเรื่องขอผ่อนผัน มติ ครม. มาที่ กลุ่มงานสิ่งแวดล้อม สำนักแผน','(4) กลุ่มงานสิ่งแวดล้อมส่งเรื่องขอผ่อนผัน มติ ครม. เข้ากระทรวง'];
 const SHORT=STEPS;
 const SEG=['--none','--s0','--s1','--s2'];
+const LB=['(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง','(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',STEPS[0]+' (แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)',STEPS[1]];
+const grp=m=>m.s[1]?3:m.s[0]?2:m.hasReq?1:0; /* แบ่งกลุ่ม (1)-(4) แถวละ 1 กลุ่ม */
 const $=id=>document.getElementById(id);
 const clean=v=>(v==null?'':String(v).trim());
 const done=v=>{v=clean(v).toLowerCase();return v!==''&&v!=='0'&&v!=='false'};
@@ -346,12 +348,13 @@ function model(r){
  return{raw:r,hasReq,s,stage,
   stl:clean(r[COL.stl])||clean(r[COL.stl2])||'ไม่มีข้อมูลสทล.',
   khw:clean(r[COL.khw])||'ไม่มีข้อมูลแขวง'}}
-function blank(){return{total:0,noReq:0,req:0,s:[0,0],at:[0,0,0]}}
-function add(a,m){a.total++;m.s.forEach((d,i)=>{if(d)a.s[i]++}); /* นับ AB/AC ทุกแถวที่มีค่า แม้ T ว่าง */
- if(!m.hasReq){if(!m.s[0])a.noReq++;return}
+function blank(){return{total:0,noReq:0,req:0,s:[0,0],at:[0,0,0],g:[0,0,0,0]}}
+function add(a,m){a.total++;m.s.forEach((d,i)=>{if(d)a.s[i]++});
+ const k=grp(m);a.g[k]++;a.noReq=a.g[0];
+ if(!m.hasReq)return;
  a.req++;a.at[m.stage]++}
 function stack(a){
- const parts=[a.noReq,a.at[0],a.s[0],a.s[1]];
+ const parts=a.g;
  return '<div class="bar">'+parts.map((n,i)=>n?`<i style="width:${n/a.total*100}%;background:var(${SEG[i]})" title="${n}"></i>`:'').join('')+'</div>'}
 
 function render(){
@@ -371,36 +374,37 @@ function render(){
 }
 
 /* ---------- ตาราง ---------- */
-function val(x,k){return (k.length==2&&k[0]=='s')?x.s[+k[1]-1]:x[k]}
+function val(x,k){return (k.length==2&&k[0]=='g')?x.g[+k[1]]:x[k]}
 function sortRows(rows){const [k,d]=SORT;
  const o=rows.slice().sort((a,b)=>{const A=val(a,k),B=val(b,k);
   const c=typeof A=='string'?nat(A,B):A-B;return c*d||nat(a.name,b.name)});
  return o}
+const SHT={g0:'(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง',g1:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องให้กลุ่มงาน สวล.',g2:'(3) ส่งเรื่องมาที่กลุ่มงานสิ่งแวดล้อม สำนักแผน',g3:'(4) กลุ่มงานสิ่งแวดล้อมส่งเรื่องเข้ากระทรวง'};
 function hdr(){
  const [k,d]=SORT;
- const L=[['name','สทล. / แขวง'],['total','ทั้งหมด'],['noReq','(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง'],['req','มีคำขอ'],['s1',STEPS[0]],['s2',STEPS[1]]];
- return '<div class="r h">'+L.map(([key,t])=>`<div class="${k==key?'on':''}" data-k="${key}">${esc(t)}${k==key?(d>0?' ▲':' ▼'):''}</div>`).join('')+'<div></div></div>'}
+ const L=[['name','สทล. / แขวง'],['total','รายการทั้งหมด'],['g0',LB[0]],['g1',LB[1]],['g2',LB[2]],['g3',LB[3]]];
+ return '<div class="r h">'+L.map(([key,t])=>`<div class="${k==key?'on':''}" data-k="${key}" title="${esc(t)}">${esc(SHT[key]||t)}${k==key?(d>0?' ▲':' ▼'):''}</div>`).join('')+'<div></div></div>'}
 function rowHTML(x,o){
  const z=n=>n?fmt(n):'<span class="zero">0</span>';
  const nm=o.kid?esc(x.name):`<span class="tg">${o.exp?(o.open?'−':'+'):''}</span>${esc(x.name)}`;
  const at=o.kid?`data-kid="${esc(x.stl+'|'+x.name)}"`:(o.exp?`data-g="${esc(x.name)}"`:'');
  return `<div class="r ${o.kid?'k e':'g'} ${(!o.kid&&o.exp)?'e':''} ${o.open?'o':''} ${o.nw?'nw':''}" ${at}${o.nw?` style="--k:${o.k}"`:''}>
-  <div class="nm">${nm}</div><div>${fmt(x.total)}</div><div>${z(x.noReq)}</div><div>${z(x.req)}</div>
-  <div>${z(x.s[0])}</div><div>${z(x.s[1])}</div><div>${stack(x)}</div></div>`}
+  <div class="nm">${nm}</div><div>${fmt(x.total)}</div><div>${z(x.g[0])}</div><div>${z(x.g[1])}</div>
+  <div>${z(x.g[2])}</div><div>${z(x.g[3])}</div><div>${stack(x)}</div></div>`}
 const one=v=>clean(v).replace(/\s*\n\s*/g,' · ');
 function foot(){
  const a=T;
- return `<div class="r f"><div>รวม</div><div>${fmt(a.total)}</div><div>${fmt(a.noReq)}</div><div>${fmt(a.req)}</div><div>${fmt(a.s[0])}</div><div>${fmt(a.s[1])}</div><div></div></div>`}
+ return `<div class="r f"><div>รวม</div><div>${fmt(a.total)}</div><div>${fmt(a.g[0])}</div><div>${fmt(a.g[1])}</div><div>${fmt(a.g[2])}</div><div>${fmt(a.g[3])}</div><div></div></div>`}
 const expandable=x=>x.kids.length>1||x.kids[0].name!==x.name;
 const MCOLS=[['ลำดับคำขออนุญาต',19],['สทล.',21,0,0,m=>m.stl],['แขวง',22,0,0,m=>m.khw],['ประเภท (ทางหลวง / ที่ดินสงวน)',23,'ประเภท'],['หมายเลขทางหลวง',24,'หมายเลขทางหลวง',1],['ตอน',5,0,1],['กม.เริ่มต้น',25,'กม.เริ่มต้น',1],['กม.สิ้นสุด',26,'กม.สิ้นสุด',1]];
 /* ค่าในช่อง: ใช้คอลัมน์ของคำขอก่อน ถ้าว่าง (รายการที่ยังไม่มีคำขอ) ค่อยหาคอลัมน์อื่นที่ชื่อหัวคอลัมน์ตรงกัน */
 function mcell(m,c){let v=one(m.raw[c[1]]);if(v)return v;if(c[4])return c[4](m);
  if(c[2])HDR.forEach((h,j)=>{if(!v&&j!==c[1]&&clean(h).includes(c[2]))v=one(m.raw[j])});return v}
 function openList(title,sub,it){
- const ix=m=>(m.hasReq||m.s[0])?m.stage+1:0;
+ const ix=grp;
  $('mt').textContent=title;$('ms').textContent=sub;
  const cn=[0,0,0,0];it.forEach(m=>cn[ix(m)]++);
- $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[['(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง',0],['(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',1],[STEPS[0],2],[STEPS[1],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
+ $('mlg').innerHTML=it.length?'<span class="lh">รายการนี้อยู่ขั้นตอนไหน:</span>'+[[LB[0],0],[LB[1],1],[LB[2],2],[LB[3],3]].map(x=>`<span class="it"><em style="background:var(${SEG[x[1]]})"></em>${esc(x[0])} <b>${cn[x[1]]}</b></span>`).join(''):'';
  $('mbody').innerHTML=it.length?'<table class="mt"><thead><tr><th>#</th>'+MCOLS.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
   it.map((m,i)=>'<tr class="st" style="--c:var('+SEG[ix(m)]+')"><td class="n">'+(i+1)+'</td>'+MCOLS.map(c=>`<td class="${c[3]?'nw':''}">${esc(mcell(m,c))||'<span class="zero">–</span>'}</td>`).join('')+'</tr>').join('')+'</tbody></table>'
   :'<div class="me">ไม่มีรายการ</div>';
@@ -414,7 +418,7 @@ function showSeries(g,si){
  const it=G.items.filter(S.p);openList(G.name,S.l+' · '+fmt(it.length)+' จาก '+fmt(G.total)+' รายการ',it)}
 function showStl(g){
  const G=GR.find(x=>x.name===g);if(!G)return;
- openList(G.name,'มีคำขอ '+fmt(G.req)+' จาก '+fmt(G.total)+' รายการ · '+STEPS[1]+' '+fmt(G.at[2]),G.items.filter(m=>m.hasReq))}
+ openList(G.name,'รายการทั้งหมด '+fmt(G.total)+' · (4) '+fmt(G.g[3]),G.items)}
 const closeM=()=>{const m=$('mo');if(m.hidden||m.classList.contains('out'))return;
  if(RM){m.hidden=true;return}
  m.classList.add('out');setTimeout(()=>{m.hidden=true;m.classList.remove('out')},190)};
@@ -449,19 +453,19 @@ function donut(parts){
 function drawCharts(){
  const G=GR.filter(x=>x.name!==NR).sort((a,b)=>nat(a.name,b.name));
  /* 1 โดนัต */
- const P=[{n:T.noReq,c:'--none',l:'(1) ยังไม่มีคำขอ หรือยังไม่ส่งเรื่อง'},{n:T.at[0],c:'--s0',l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.'},
-  {n:T.s[0],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.s[1],c:'--s2',l:STEPS[1]}];
+ const P=[{n:T.g[0],c:'--none',l:LB[0]},{n:T.g[1],c:'--s0',l:LB[1]},
+  {n:T.g[2],c:'--s1',l:STEPS[0],s:'(แต่ยังไม่ได้ส่งเรื่องเข้ากระทรวง)'},{n:T.g[3],c:'--s2',l:STEPS[1]}];
  $('c1').innerHTML=donut(P)+'<div class="dl">'+P.map(p=>`<div class="${p.n?'':'z'}"><em style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(${p.c});flex:none;margin-top:4px"></em><span style="color:inherit">${esc(p.l)}${p.s?`<small>${esc(p.s)}</small>`:''}</span><b data-n="${p.n}">${fmt(p.n)}</b></div>`).join('')+'</div>';
  /* 2 แท่งเปรียบเทียบรายสทล. */
- const SER=[{l:'รายการทั้งหมด',c:'--none',f:x=>x.total,p:m=>true},{l:'มีคำขอ',c:'--req',f:x=>x.req,p:m=>m.hasReq},{l:'(2) ยื่นคำขอแล้ว ยังไม่ส่งเรื่องขอผ่อนผัน มติ ครม. ให้กลุ่มงาน สวล.',c:'--s0',f:x=>x.at[0],p:m=>m.hasReq&&m.stage===0},{l:SHORT[0],c:'--s1',f:x=>x.s[0],p:m=>m.s[0]},{l:SHORT[1],c:'--s2',f:x=>x.s[1],p:m=>m.s[1]}];SERS=SER;;
+ const SER=[{l:'รายการทั้งหมด',c:'--req',f:x=>x.total,p:m=>true}].concat(LB.map((l,k)=>({l:l,c:SEG[k],f:x=>x.g[k],p:m=>grp(m)===k})));SERS=SER;
  const mx=Math.max(1,...G.map(x=>x.total));
  $('c2').innerHTML='<div class="grs">'+G.map((x,gi)=>'<div class="gr">'+SER.map((s,si)=>{const v=s.f(x);
-  return `<div class="bw" data-g="${esc(x.name)}" data-s="${si}" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*4+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
+  return `<div class="bw" data-g="${esc(x.name)}" data-s="${si}" title="${esc(x.name)} · ${esc(s.l)}: ${v}"><div class="bv" style="height:${v/mx*100}%;background:var(${s.c});--j:${gi*5+si}"><span>${v||''}</span></div></div>`}).join('')+'</div>').join('')+'</div>';
  $('c2l').innerHTML=G.map(x=>`<div title="${esc(x.name)}">${esc(short(x.name))}</div>`).join('');
  $('c2g').innerHTML=SER.map(s=>`<span><em style="background:var(${s.c})"></em>${esc(s.l)}</span>`).join('');
  /* 4 วงแหวนรายสทล. */
- $('c4').innerHTML=G.map(x=>`<div class="ring" data-g="${esc(x.name)}">${ring(38,9,96,x.req?x.at[2]/x.req:0,'var(--s2)',x.req?pct(x.at[2],x.req)+'%':'–',null,x.req?pct(x.at[2],x.req):null)}
-  <div class="rt"><b title="${esc(x.name)}">${esc(short(x.name))}</b>${x.at[2]} / ${x.req} คำขอ</div></div>`).join('');
+ $('c4').innerHTML=G.map(x=>`<div class="ring" data-g="${esc(x.name)}">${ring(38,9,96,x.total?x.g[3]/x.total:0,'var(--s2)',x.total?pct(x.g[3],x.total)+'%':'–',null,x.total?pct(x.g[3],x.total):null)}
+  <div class="rt"><b title="${esc(x.name)}">${esc(short(x.name))}</b>${x.g[3]} / ${x.total} รายการ</div></div>`).join('');
 }
 
 document.addEventListener('click',e=>{
